@@ -1,8 +1,8 @@
-# electron-boilerplate
+# Worship Electron
 
-A minimalistic boilerplate for [Electron runtime](http://electron.atom.io). Tested on Windows, macOS and Linux.  
+Based on [electron-boilerplate](https://github.com/szwacz/electron-boilerplate), which is based on [Electron runtime](http://electron.atom.io).
 
-This project contains only bare minimum of dependencies, to provide you with nice development environment. Doesn't impose on you any frontend technologies, so you can pick your favourite.
+Most of the following documentation is from electron-boilerplate, and should be updated once the project is up and running.
 
 # Quick start
 
@@ -14,6 +14,7 @@ npm install
 npm start
 ```
 ...and you have a running desktop application on your screen.
+
 
 # Structure of the project
 
