@@ -1,0 +1,96 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: sans-serif;
+  color: #525252;
+}
+
+a {
+  text-decoration: none;
+  color: #cb3837;
+}
+
+.container {
+  text-align: center;
+}
+
+/* worship.css */
+
+
+button {
+  min-width: 10px;
+  border: 2px solid #aaa;
+  background-color: #ddd;
+}
+
+#worship_preview_box {
+  width: 250px;
+  height: 200px;
+  background: black;
+  color: white;
+}
+#worship_preview {
+  text-align: center;
+}
+#worship_preview_box description{
+  word-wrap: break-word;
+  width: 250px;
+}
+
+#worship_presentation_box {
+  background: black;
+  color: white;
+}
+#worship_presentation_box  description {
+  word-wrap: break-word;
+}
+#worship_preview_box description span, #worship_presentation_box  description span {
+  display: inline-block;
+}
+#worship_presentation {
+  text-align: center;
+}
+.identifier {
+  font-style: italic;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+#worship_preview_title {
+  font-size: 60%;
+  /*color: #ccc;*/
+  opacity: 0.6;
+}
+#worship_preview_author, #worship_preview_copyright, #worship_preview_ccli {
+  font-size: 40%;
+  /*color: #aaa;*/
+  opacity: 0.4;
+}
+
+.underline {
+  text-decoration: underline;
+}
+.region2 {
+  font-size: 100%;
+}
+
+
+
+/* worshipSlidesUI.css */
+
+/* #worshipslides-start-button {
+  list-style-image: url("chrome://worshipslides/skin/music_folder.png");
+}
+
+toolbarbutton.worshipslides-toolbarbutton {
+  list-style-image: url("chrome://worshipslides/skin/music_folder.png");
+} */

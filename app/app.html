@@ -1,0 +1,226 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Worship Slides</title>
+</head>
+<body>
+  
+  <!-- <window
+    title=""
+    onload="WorshipSlides.MainWindow.onLoad();"
+    onunload="WorshipSlides.MainWindow.onUnload(event);"
+    onkeypress="return WorshipSlides.MainWindow.shortcuts(event);"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    xmlns:html="http://www.w3.org/1999/xhtml">
+    
+    <script type="application/x-javascript"
+      src="chrome://worshipslides/content/worship.js" /> 
+    <keyset>
+      <key modifiers="" key="A" oncommand="WorshipSlides.MainWindow.addItem(event,'song');" />
+      <key modifiers="" key="X" oncommand="WorshipSlides.MainWindow.addItem(event,'text');" />
+      <key modifiers="" key="D" oncommand="WorshipSlides.MainWindow.editItem(event);" />
+      <key modifiers="" key="S" oncommand="WorshipSlides.MainWindow.startPresentation(event);" />
+      <key modifiers="" key="R" oncommand="WorshipSlides.MainWindow.removeItem(event);" />
+      <key modifiers="" key="N" oncommand="WorshipSlides.MainWindow.addNewSong(event);" />
+      <key modifiers="" key="." oncommand="WorshipSlides.MainWindow.blankToggle(event);" />
+    </keyset> -->
+    
+  <section style="display: flex">
+    <div style="display: flex; flex-direction: column;">
+      <label control="worship_set" class="header">
+        Worship Set
+      </label>
+      <div>
+        <select id="worship_sets_list" oncommand="WorshipSlides.MainWindow.selectSet(event);">
+          <option value="">Empty</option>
+          <!-- <menupopup id="worship_sets_popup">
+          </menupopup> -->
+        </select>
+        <button title="New worship set"
+                oncommand="WorshipSlides.MainWindow.addSet(event);">
+                +
+        </button>
+        <button title="Remove worship set"
+                oncommand="WorshipSlides.MainWindow.deleteSet(event);">
+                -
+        </button>
+      </div>
+      <label control="worship_items" class="header">
+        Worship Items
+      </label>
+      <div>
+        <button id="button_add"
+                accesskey="A"
+                tooltiptext="Add song (Shortcut: a)"
+                oncommand="WorshipSlides.MainWindow.addItem(event,'song');">
+                Add song
+        </button>
+        <button accesskey="X"
+                tooltiptext="Add text (Shortcut: x)"
+                oncommand="WorshipSlides.MainWindow.addItem(event,'text');">
+                Add text
+        </button>
+        <button accesskey="D"
+                tooltiptext="Edit item (Shortcut: d)"
+                oncommand="WorshipSlides.MainWindow.editItem(event);">
+                Edit
+        </button>
+        <button accesskey="R"
+                tooltiptext="Remove item (Shortcut: r)"
+                oncommand="WorshipSlides.MainWindow.removeItem(event);">
+                Remove
+        </button>
+      </div>
+      <div style="flex:1; display: flex;">
+        <select flex="1" id="worship_items"
+          multiple="multiple"
+          onselect="WorshipSlides.MainWindow.itemSelected(event);"
+          onchange="alert('changed');">
+        </select>
+        <div>
+          <button
+                  tooltiptext="Move item up (Shortcut: Shift + Page Up)"
+                  oncommand="WorshipSlides.MainWindow.moveItem(-1);">
+            ↑
+          </button>
+          <button
+                  tooltiptext="Move item down (Shortcut: Shift + Page Down)"
+                  oncommand="WorshipSlides.MainWindow.moveItem(1);">
+            ↓
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div style="flex: 1">
+      <label control="worship_lyrics" class="header">
+        Lyrics  
+      </label>
+      <div style="text-align: center">
+        <label value="Jump to:" />
+        <button accesskey="1"
+                oncommand="WorshipSlides.MainWindow.jumpTo('1');">
+                Verse 1
+        </button>
+        <button accesskey="2"
+                oncommand="WorshipSlides.MainWindow.jumpTo('2');">
+                Verse 2
+        </button>
+        <button accesskey="3"
+                oncommand="WorshipSlides.MainWindow.jumpTo('3');">
+                Verse 3
+        </button>
+        <button accesskey="4"
+                oncommand="WorshipSlides.MainWindow.jumpTo('4');">
+                Verse 4
+        </button>
+        <button accesskey="5"
+                oncommand="WorshipSlides.MainWindow.jumpTo('5');">
+                Verse 5
+        </button>
+      </div>
+      <div style="text-align: center">
+        <button accesskey="P"
+                oncommand="WorshipSlides.MainWindow.jumpTo('P');">
+                Prechorus
+        </button>
+        <button accesskey="C"
+                oncommand="WorshipSlides.MainWindow.jumpTo('C');">
+                Chorus
+        </button>
+        <button accesskey="B"
+                oncommand="WorshipSlides.MainWindow.jumpTo('B');">
+                Bridge
+        </button>
+        <button accesskey="T"
+                oncommand="WorshipSlides.MainWindow.jumpTo('T');">
+                Chorus 2 (T)
+        </button>
+        <button accesskey="W"
+                oncommand="WorshipSlides.MainWindow.jumpTo('W');">
+                Bridge 2 (W)
+        </button>
+        <button accesskey="E"
+                oncommand="WorshipSlides.MainWindow.jumpTo('E');">
+                Ending
+        </button>
+      </div>
+      <!-- <richlistbox flex="1" id="worship_lyrics"
+        onselect="WorshipSlides.MainWindow.selectVerse(event);">
+      </richlistbox> -->
+    </div>
+    
+    <div>
+      <button oncommand="WorshipSlides.MainWindow.configuration(event);">
+        Configuration
+        </button>
+      <button accesskey="S"
+              tooltiptext="Starts the presentation window (Shortcut: s)"
+              oncommand="WorshipSlides.MainWindow.startPresentation(event);">
+              Start presentation
+        </button>
+      <button tooltiptext="Hides/shows the lyrics (Shortcut: .)"
+              oncommand="WorshipSlides.MainWindow.blankToggle(event);">
+              Blank (Shortcut: .)
+        </button>
+              Blank
+      </button>
+      <label value="Preview" class="header">
+        Preview  
+      </label>
+      <div id="worship_preview_box">
+        <box id="worship_preview" pack="center" align="center" flex="1" />
+        <div>
+          <description id="worship_preview_title" />
+          <description id="worship_preview_author"/>
+          <description id="worship_preview_copyright"/>
+          <description id="worship_preview_ccli"/>
+        </div>
+      </div>
+      <div>
+        <label class="header">
+          Keyboard shortcuts
+        </label>
+        <dl>
+          <dt>Arrow up</dt>
+          <dd>Previous verse/slide</dd>
+          <dt>Arrow down</dt>
+          <dd>Next verse/slide</dd>
+          <dt>Page up</dt>
+          <dd>Previous song/text</dd>
+          <dt>Page down</dt>
+          <dd>Next song/text</dd>
+          <dt>.</dt>
+          <dd>Black screen toggle</dd>
+          <dt>F11</dt>
+          <dd>Full screen</dd>
+          <dd>(Use this when the slide window is selected)</dd>
+        </dl>
+      <button tooltiptext="Opens up a new tab with the entire worship set as HTML."
+              oncommand="WorshipSlides.MainWindow.exportHTML();">
+              Export worship set
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div id="app" class="container" style="display: none;">
+    <h1 id="greet"></h1>
+    <p>
+      Welcome to <a href="http://electron.atom.io" class="js-external-link">Electron</a> app running on this <strong id="os"></strong> machine.
+    </p>
+    <p>
+      App author: <strong id="author"></strong>
+    </p>
+    <p>
+      Environment: <strong id="env"></strong>
+    </p>
+    <p>
+      Electron version: <strong id="electron-version"></strong>
+    </p>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
