@@ -8,8 +8,8 @@ Most of the following documentation is from electron-boilerplate, and should be 
 
 Make sure you have [Node.js](https://nodejs.org) installed, then type the following commands known to every Node developer...
 ```
-git clone https://github.com/szwacz/electron-boilerplate.git
-cd electron-boilerplate
+git clone https://github.com/NCCC/worship-electron.git
+cd worship-electron
 npm install
 npm start
 ```
