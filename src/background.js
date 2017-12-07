@@ -15,11 +15,12 @@ import createWindow from "./helpers/window";
 import env from "env";
 
 const setApplicationMenu = () => {
-  const menus = [editMenuTemplate];
-  if (env.name !== "production") {
-    menus.push(devMenuTemplate);
-  }
-  Menu.setApplicationMenu(Menu.buildFromTemplate(menus));
+  // const menus = [editMenuTemplate];
+  // if (env.name !== "production") {
+  //   menus.push(devMenuTemplate);
+  // }
+  // Menu.setApplicationMenu(Menu.buildFromTemplate(menus));
+  Menu.setApplicationMenu(null);
 };
 
 // Save userData in separate folders for each environment.
@@ -45,6 +46,10 @@ app.on("ready", () => {
       slashes: true
     })
   );
+
+  mainWindow.on("closed", () => {
+    app.quit();
+  });
 
   if (env.name === "development") {
     mainWindow.openDevTools();

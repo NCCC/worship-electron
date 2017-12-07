@@ -10,32 +10,11 @@ import "./helpers/external_links.js";
 
 import { remote } from "electron";
 import jetpack from "fs-jetpack";
-import { greet } from "./hello_world/hello_world";
-import env from "env";
 
 const app = remote.app;
 const appDir = jetpack.cwd(app.getAppPath());
 
-// Holy crap! This is browser window with HTML and stuff, but I can read
-// files from disk like it's node.js! Welcome to Electron world :)
-const manifest = appDir.read("package.json", "json");
-
-const osMap = {
-  win32: "Windows",
-  darwin: "macOS",
-  linux: "Linux"
-};
-
-// document.querySelector("#app").style.display = "block";
-document.querySelector("#greet").innerHTML = greet();
-document.querySelector("#os").innerHTML = osMap[process.platform];
-document.querySelector("#author").innerHTML = manifest.author;
-document.querySelector("#env").innerHTML = env.name;
-document.querySelector("#electron-version").innerHTML =
-  process.versions.electron;
-
-
-   /**
+/**
  * WorshipSlides namespace.
  */
 if ("undefined" == typeof(WorshipSlides)) {
@@ -103,8 +82,13 @@ WorshipSlides.MainWindow = {
     //   if (prompts.confirm( window, 'No song path is configured', 'You have not configured a valid song path. Open configuration window?'))
     //     this.configuration();
     // }
-    // this.loadSets();
+    this.loadSets();
+    this.bindListeners();
     // this.loadColors();
+  },
+  bindListeners : function() {
+    var setlist = document.getElementById('worship_sets_list');
+    setlist.addEventListener('change', this.selectSet);    
   },
   onUnload : function(event) {
     var opened_windows = WorshipSlides.MainWindow.opened_windows;
@@ -140,16 +124,18 @@ WorshipSlides.MainWindow = {
     this.loadColors();
   },
   getPref : function(pref) {
-    return prefService.getCharPref(
-      "extensions.worshipslides."+pref);
+    return '';
+    // return prefService.getCharPref(
+    //   "extensions.worshipslides."+pref);
   },
   setPref : function(pref, value) {
-    prefService.setCharPref(
-      "extensions.worshipslides."+pref, value);
+    // prefService.setCharPref(
+    //   "extensions.worshipslides."+pref, value);
   },
   getIntPref : function(pref) {
-    return prefService.getIntPref(
-      "extensions.worshipslides."+pref);
+    return '';
+    // return prefService.getIntPref(
+    //   "extensions.worshipslides."+pref);
   },
   addItem : function(aEvent, type) {
     this.addType = type;
@@ -349,33 +335,59 @@ WorshipSlides.MainWindow = {
       'worshipslides-edittext-window') );
   },
   loadSets : function() {
-    var setpath = this.getPref('setpath');
-    var setdir = new FileUtils.File(setpath);
-    var last_used_set = this.getPref('last_used_set');
-    if (setdir.exists() && setdir.isDirectory())
-    {
-      var setlist = document.getElementById('worship_sets_list');
-      var setpopup = document.getElementById('worship_sets_popup');
-      while (setpopup.hasChildNodes())
-        setpopup.removeChild(0);
-      
-      var entries = setdir.directoryEntries;
-      while (entries.hasMoreElements())
-      {
-        var entry = entries.getNext();
-        entry.QueryInterface(Components.interfaces.nsIFile);
-        name = entry.leafName;
-        if (name.slice(-4) == '.txt') {
-          var setname = name.slice(0,-4);
-          var item = setlist.appendItem( setname );
-          if (setname == last_used_set)
-          {
-            setlist.selectedItem = item;
-            this.selectSet(null);
+    // var setpath = this.getPref('setpath');
+    var setpath = 'userdata/sets';
+    // var setdir = new FileUtils.File(setpath);
+    // var last_used_set = this.getPref('last_used_set');
+    var entries = appDir.list(setpath);
+    console.log('Setlist: ', entries);
+    if (entries) {
+        var setlist = document.getElementById('worship_sets_list');
+        // var setpopup = document.getElementById('worship_sets_popup');
+        // while (setpopup.hasChildNodes())
+        //   setpopup.removeChild(0);
+
+        for(var i = 0; i < entries.length; i++) {
+          var name = entries[i];
+          if (name.slice(-4) == '.txt') {
+            var setname = name.slice(0,-4);
+            var option = document.createElement('option');
+            option.innerText = setname;
+            option.value = setname;
+            var item = setlist.appendChild( option );
+            // if (setname == last_used_set)
+            // {
+            //   setlist.selectedItem = item;
+            //   this.selectSet(null);
+            // }
           }
         }
-      }
+
     }
+    // if (setdir.exists() && setdir.isDirectory())
+    // {
+    //   var setlist = document.getElementById('worship_sets_list');
+    //   var setpopup = document.getElementById('worship_sets_popup');
+    //   while (setpopup.hasChildNodes())
+    //     setpopup.removeChild(0);
+      
+    //   var entries = setdir.directoryEntries;
+    //   while (entries.hasMoreElements())
+    //   {
+    //     var entry = entries.getNext();
+    //     entry.QueryInterface(Components.interfaces.nsIFile);
+    //     name = entry.leafName;
+    //     if (name.slice(-4) == '.txt') {
+    //       var setname = name.slice(0,-4);
+    //       var item = setlist.appendItem( setname );
+    //       if (setname == last_used_set)
+    //       {
+    //         setlist.selectedItem = item;
+    //         this.selectSet(null);
+    //       }
+    //     }
+    //   }
+    // }
     //else console.log('No set directory found');
   },
   addSet : function( event ) {
@@ -399,35 +411,59 @@ WorshipSlides.MainWindow = {
     }
   },
   selectSet : function( event ) {
-    var setlist = document.getElementById('worship_sets_list');
-    var setname = setlist.selectedItem.getAttribute('label');
-    var setpath = WorshipSlides.MainWindow.getPref('setpath');
-    var setfile = new FileUtils.File(setpath);
-    setfile.append( setname+'.txt' );
-    if (setfile.exists() && setfile.isFile())
-    {
-      NetUtil.asyncFetch(setfile, function(inputStream, status) {
-        if (!Components.isSuccessCode(status)) {
-          prompts.alert(window,'Error reading set file!','An error occured while trying to read the set file. Maybe it was deleted? Try refreshing this page.');
-          return;
-        }
-        var worship_items = document.getElementById('worship_items');
-        while (worship_items.hasChildNodes())
-          worship_items.removeItemAt(0);
-          
-        var data = NetUtil.readInputStreamToString(inputStream, inputStream.available(), {charset : 'UTF-8'} );
-        if (data) {
-          var lines = data.split(/\r?\n/);
-          for (var index = 0; index < lines.length; index++)
-          {
-            if (lines[index] != "")
-              worship_items.appendItem(lines[index]);
+    console.log('Set selected.', event.target.value);
+    var setname = event.target.value;
+    var setfile = appDir.read('userdata/sets/' + setname + '.txt');
+    console.log('Set: ', setfile);
+    if(setfile) {
+      var data = setfile;
+      var worship_items = document.getElementById('worship_items');
+      //     while (worship_items.hasChildNodes())
+      //       worship_items.removeItemAt(0);
+      if (data) {
+        var lines = data.split(/\r?\n/);
+        for (var index = 0; index < lines.length; index++)
+        {
+          if (lines[index] != "") {
+            var option = document.createElement('option');
+            option.innerText = lines[index];
+            option.value = lines[index];
+            var item = worship_items.appendChild( option );
           }
-          worship_items.selectedIndex = 0;
+            worship_items.appendItem(lines[index]);
         }
-        WorshipSlides.MainWindow.setPref('last_used_set',setname);
-      });
+        // worship_items.selectedIndex = 0;
+      }
     }
+    // var setlist = document.getElementById('worship_sets_list');
+    // var setname = setlist.selectedItem.getAttribute('label');
+    // var setpath = WorshipSlides.MainWindow.getPref('setpath');
+    // var setfile = new FileUtils.File(setpath);
+    // setfile.append( setname+'.txt' );
+    // if (setfile.exists() && setfile.isFile())
+    // {
+    //   NetUtil.asyncFetch(setfile, function(inputStream, status) {
+    //     if (!Components.isSuccessCode(status)) {
+    //       prompts.alert(window,'Error reading set file!','An error occured while trying to read the set file. Maybe it was deleted? Try refreshing this page.');
+    //       return;
+    //     }
+    //     var worship_items = document.getElementById('worship_items');
+    //     while (worship_items.hasChildNodes())
+    //       worship_items.removeItemAt(0);
+          
+    //     var data = NetUtil.readInputStreamToString(inputStream, inputStream.available(), {charset : 'UTF-8'} );
+    //     if (data) {
+    //       var lines = data.split(/\r?\n/);
+    //       for (var index = 0; index < lines.length; index++)
+    //       {
+    //         if (lines[index] != "")
+    //           worship_items.appendItem(lines[index]);
+    //       }
+    //       worship_items.selectedIndex = 0;
+    //     }
+    //     WorshipSlides.MainWindow.setPref('last_used_set',setname);
+    //   });
+    // }
   },
   saveSet : function() {
     //console.log("Saving set now...");
@@ -822,5 +858,3 @@ WorshipSlides.MainWindow = {
     }
   }
 };
-
-WorshipSlides.MainWindow.onLoad();

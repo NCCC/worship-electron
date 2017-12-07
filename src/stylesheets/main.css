@@ -23,6 +23,29 @@ a {
   text-align: center;
 }
 
+/* New stuff */
+
+.column {
+  padding: 1em;
+}
+.column--left, 
+.column--right {
+  background-color: #eee;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex--v {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex__main {
+  flex: 1;
+}
+
 /* worship.css */
 
 
@@ -30,6 +53,9 @@ button {
   min-width: 10px;
   border: 2px solid #aaa;
   background-color: #ddd;
+  padding: .3em .8em;
+  border-radius: 3em;
+  margin-bottom: .3em;
 }
 
 #worship_preview_box {

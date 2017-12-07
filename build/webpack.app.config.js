@@ -5,6 +5,7 @@ const base = require("./webpack.base.config");
 module.exports = env => {
   return merge(base(env), {
     entry: {
+      vueapp: "./src/vueapp.js",
       background: "./src/background.js",
       app: "./src/app.js"
     },

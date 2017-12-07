@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <title>Worship Slides</title>
+  <!-- <script src="https://unpkg.com/vue"></script> -->
 </head>
 <body>
-  
   <!-- <window
     title=""
     onload="WorshipSlides.MainWindow.onLoad();"
@@ -26,16 +26,16 @@
       <key modifiers="" key="." oncommand="WorshipSlides.MainWindow.blankToggle(event);" />
     </keyset> -->
     
-  <section style="display: flex">
-    <div style="display: flex; flex-direction: column;">
+  <section id="app" class="flex" style="height: 100%; width: 100%;">
+    <div class="column column--left flex--v">
       <label control="worship_set" class="header">
-        Worship Set
+        Worship Set {{message}}
       </label>
-      <div>
-        <select id="worship_sets_list" oncommand="WorshipSlides.MainWindow.selectSet(event);">
-          <option value="">Empty</option>
-          <!-- <menupopup id="worship_sets_popup">
-          </menupopup> -->
+      <div class="flex">
+        <select v-model="selectedSet" class="flex__main" @change="selectSet">
+          <option v-for="set in worshipSets" v-bind:value="set">
+            {{ set }}
+          </option>
         </select>
         <button title="New worship set"
                 oncommand="WorshipSlides.MainWindow.addSet(event);">
@@ -73,12 +73,15 @@
         </button>
       </div>
       <div style="flex:1; display: flex;">
-        <select flex="1" id="worship_items"
-          multiple="multiple"
-          onselect="WorshipSlides.MainWindow.itemSelected(event);"
-          onchange="alert('changed');">
+        <select class="flex__main"
+          size="30"
+          v-model="selectedItem" 
+          @change="selectItem">
+          <option v-for="item in worshipItems" v-bind:value="item">
+            {{ item }}
+          </option>
         </select>
-        <div>
+        <div class="flex--v">
           <button
                   tooltiptext="Move item up (Shortcut: Shift + Page Up)"
                   oncommand="WorshipSlides.MainWindow.moveItem(-1);">
@@ -93,7 +96,7 @@
       </div>
     </div>
     
-    <div style="flex: 1">
+    <div class="column column--middle" style="flex: 1">
       <label control="worship_lyrics" class="header">
         Lyrics  
       </label>
@@ -151,31 +154,32 @@
       </richlistbox> -->
     </div>
     
-    <div>
-      <button oncommand="WorshipSlides.MainWindow.configuration(event);">
-        Configuration
+    <div class="column column--right" >
+      <div class="flex--v">
+        <button oncommand="WorshipSlides.MainWindow.configuration(event);">
+          Configuration
         </button>
-      <button accesskey="S"
-              tooltiptext="Starts the presentation window (Shortcut: s)"
-              oncommand="WorshipSlides.MainWindow.startPresentation(event);">
-              Start presentation
+        <button accesskey="S"
+                title="Starts the presentation window (Shortcut: s)"
+                v-on:click="openLyricsWindow">
+                Start presentation
         </button>
-      <button tooltiptext="Hides/shows the lyrics (Shortcut: .)"
-              oncommand="WorshipSlides.MainWindow.blankToggle(event);">
-              Blank (Shortcut: .)
+        <button tooltiptext="Hides/shows the lyrics (Shortcut: .)"
+                oncommand="WorshipSlides.MainWindow.blankToggle(event);">
+                Blank (Shortcut: .)
         </button>
-              Blank
-      </button>
-      <label value="Preview" class="header">
+      </div>
+      <label class="header">
         Preview  
       </label>
       <div id="worship_preview_box">
-        <box id="worship_preview" pack="center" align="center" flex="1" />
+        <div id="worship_preview" pack="center" align="center" flex="1">
+        </div>
         <div>
-          <description id="worship_preview_title" />
-          <description id="worship_preview_author"/>
-          <description id="worship_preview_copyright"/>
-          <description id="worship_preview_ccli"/>
+          <span id="worship_preview_title" />
+          <span id="worship_preview_author"/>
+          <span id="worship_preview_copyright"/>
+          <span id="worship_preview_ccli"/>
         </div>
       </div>
       <div>
@@ -221,6 +225,10 @@
     </p>
   </div>
 
+  <script>
+    require('./vueapp.js');
+  </script>
   <script src="app.js"></script>
+  
 </body>
 </html>

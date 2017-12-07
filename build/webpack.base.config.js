@@ -12,7 +12,8 @@ module.exports = env => {
     externals: [nodeExternals()],
     resolve: {
       alias: {
-        env: path.resolve(__dirname, `../config/env_${env}.json`)
+        env: path.resolve(__dirname, `../config/env_${env}.json`),
+        vuea: 'vue/dist/vue.js' // Aliased vue with an alternative name to get the compiler-included build of Vue
       }
     },
     devtool: "source-map",

@@ -1,15 +1,15 @@
 {
-  "name": "electron-boilerplate",
-  "productName": "Electron Boilerplate",
-  "description": "Starter for your Electron application",
+  "name": "worship-electron",
+  "productName": "NCCC Worship Electron",
+  "description": "NCCC Worship Slides Desktop Application",
   "version": "0.0.0",
   "private": true,
-  "author": "Mr. Gumby <mr.gumby@example.com>",
-  "copyright": "© 2017, Gumby inc.",
-  "homepage": "http://example.com",
+  "author": "L <contact@nccc.se>",
+  "copyright": "© 2017, NCCC",
+  "homepage": "http://nccc.se",
   "main": "app/background.js",
   "build": {
-    "appId": "com.example.electron-boilerplate",
+    "appId": "se.nccc.worship-electron",
     "files": [
       "app/**/*",
       "node_modules/**/*",
@@ -31,7 +31,8 @@
     "release": "npm test && webpack --config=build/webpack.app.config.js --env=production && electron-builder"
   },
   "dependencies": {
-    "fs-jetpack": "^1.0.0"
+    "fs-jetpack": "^1.0.0",
+    "vue": "2.5.9"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.5",
