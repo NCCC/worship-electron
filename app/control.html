@@ -26,10 +26,10 @@
       <key modifiers="" key="." oncommand="WorshipSlides.MainWindow.blankToggle(event);" />
     </keyset> -->
     
-  <section id="app" class="flex" style="height: 100%; width: 100%;">
+  <section id="control" class="flex" style="height: 100%; width: 100%;">
     <div class="column column--left flex--v">
       <label control="worship_set" class="header">
-        Worship Set {{message}}
+        Worship Set
       </label>
       <div class="flex">
         <select v-model="selectedSet" class="flex__main" @change="selectSet">
@@ -149,6 +149,11 @@
                 Ending
         </button>
       </div>
+      <label v-for="(textArray, key) in verses" class="verse_selector">
+        <input type="radio" v-bind:value="key" @change="selectVerse" v-model="selectedVerse">
+        <h3>{{key}}:</h3>
+        <p v-for="line in textArray" class="">{{line}}</p>
+      </label>
       <!-- <richlistbox flex="1" id="worship_lyrics"
         onselect="WorshipSlides.MainWindow.selectVerse(event);">
       </richlistbox> -->
@@ -156,16 +161,17 @@
     
     <div class="column column--right" >
       <div class="flex--v">
-        <button oncommand="WorshipSlides.MainWindow.configuration(event);">
-          Configuration
-        </button>
-        <button accesskey="S"
+        <label control="worship_lyrics" class="header">
+          Presentation  
+        </label>
+        <button class="btn--main"
+                accesskey="S"
                 title="Starts the presentation window (Shortcut: s)"
-                v-on:click="openLyricsWindow">
+                @click="openPresentationWindow">
                 Start presentation
         </button>
         <button tooltiptext="Hides/shows the lyrics (Shortcut: .)"
-                oncommand="WorshipSlides.MainWindow.blankToggle(event);">
+                @click="showBlank">
                 Blank (Shortcut: .)
         </button>
       </div>
@@ -186,7 +192,7 @@
         <label class="header">
           Keyboard shortcuts
         </label>
-        <dl>
+        <dl class="shortcuts">
           <dt>Arrow up</dt>
           <dd>Previous verse/slide</dd>
           <dt>Arrow down</dt>
@@ -205,6 +211,10 @@
               oncommand="WorshipSlides.MainWindow.exportHTML();">
               Export worship set
         </button>
+        <button oncommand="WorshipSlides.MainWindow.configuration(event);">
+          Configuration
+        </button>
+
       </div>
     </div>
   </section>
@@ -226,7 +236,7 @@
   </div>
 
   <script>
-    require('./vueapp.js');
+    require('./control.js');
   </script>
   <script src="app.js"></script>
   

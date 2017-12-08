@@ -20,7 +20,11 @@ const setApplicationMenu = () => {
   //   menus.push(devMenuTemplate);
   // }
   // Menu.setApplicationMenu(Menu.buildFromTemplate(menus));
-  Menu.setApplicationMenu(null);
+  if (env.name !== "production") {
+    Menu.setApplicationMenu(Menu.buildFromTemplate([devMenuTemplate]));
+  } else {
+    Menu.setApplicationMenu(null);
+  }
 };
 
 // Save userData in separate folders for each environment.
@@ -39,9 +43,12 @@ app.on("ready", () => {
     height: 600
   });
 
+  this.controlApp = null;
+  this.presentationApp = null;
+
   mainWindow.loadURL(
     url.format({
-      pathname: path.join(__dirname, "app.html"),
+      pathname: path.join(__dirname, "control.html"),
       protocol: "file:",
       slashes: true
     })
