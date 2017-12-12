@@ -9,11 +9,13 @@
 <body>
     <div class="flex flex--v" id="presentation">
         <div class="flex__main">
-            {{content}}
+            <p v-for="line in content" class="">{{line}}</p>
         </div>
         <div class="flex">
             <div class="flex__main">{{title}}</div>
             <div>{{author}}</div>
+        </div>
+        <div class="blank-overlay" v-bind:class="{ 'blank-overlay--hidden': !isBlank }">
         </div>
     </div>
     <script>

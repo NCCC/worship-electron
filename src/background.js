@@ -42,10 +42,7 @@ app.on("ready", () => {
     width: 1000,
     height: 600
   });
-
-  this.controlApp = null;
-  this.presentationApp = null;
-
+  
   mainWindow.loadURL(
     url.format({
       pathname: path.join(__dirname, "control.html"),

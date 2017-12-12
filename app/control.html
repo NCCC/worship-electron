@@ -96,7 +96,7 @@
       </div>
     </div>
     
-    <div class="column column--middle" style="flex: 1">
+    <div class="column column--middle flex--v" style="flex: 1">
       <label control="worship_lyrics" class="header">
         Lyrics  
       </label>
@@ -149,11 +149,13 @@
                 Ending
         </button>
       </div>
-      <label v-for="(textArray, key) in verses" class="verse_selector">
-        <input type="radio" v-bind:value="key" @change="selectVerse" v-model="selectedVerse">
-        <h3>{{key}}:</h3>
-        <p v-for="line in textArray" class="">{{line}}</p>
-      </label>
+      <div class="verse_list">
+        <label v-for="page in versePages" class="verse_selector" @click="selectVerse" v-bind:class="{ active: page.key === selectedVerse }">
+          <input type="radio" v-bind:value="page.key" v-model="selectedVerse">
+          <h3>{{page.key}}:</h3>
+          <div v-for="line in page.lines" class="">{{line}}</div>
+        </label>
+      </div>
       <!-- <richlistbox flex="1" id="worship_lyrics"
         onselect="WorshipSlides.MainWindow.selectVerse(event);">
       </richlistbox> -->
@@ -171,7 +173,7 @@
                 Start presentation
         </button>
         <button tooltiptext="Hides/shows the lyrics (Shortcut: .)"
-                @click="showBlank">
+                @click="toggleBlank">
                 Blank (Shortcut: .)
         </button>
       </div>

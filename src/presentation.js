@@ -15,17 +15,23 @@ const ipcRenderer = electron.ipcRenderer;
 var presentationApp = new Vue({
     el: '#presentation',
     data: {
-        content: 'content-placeholder',
+        content: ['content-placeholder'],
         title: 'title-placeholder',
-        author: 'author-placeholder'
+        author: 'author-placeholder',
+        isBlank: false
     }
 })
 
-ipcRenderer.on('update-presentation', function (data) {
-    console.log(data);
+ipcRenderer.on('update-presentation', function (event, data) {
+    console.log('Updating presentation:', data);
     if(data) {
-        presentationApp.content = data.content || '';
-        presentationApp.title = data.title || '';
-        presentationApp.author = data.author || '';
+        if(data.hasOwnProperty('content')) presentationApp.content = data.content;
+        if(data.hasOwnProperty('title')) presentationApp.title = data.title;
+        if(data.hasOwnProperty('author')) presentationApp.author = data.author;
     }
+});
+
+ipcRenderer.on('toggle-blank-presentation', function (event, value) {
+    console.log('Blanking out presentation:', value);
+    presentationApp.isBlank = value;
 });

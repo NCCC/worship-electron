@@ -25,6 +25,8 @@ var verse_map = {
 	w: 'bridge 2',
 	e: 'ending'
 };  
+const NEW_PAGE_INDICATOR = '---';
+const REGION2_INDICATOR = '+';
 
 var controlApp = new Vue({
     el: '#control',
@@ -34,13 +36,20 @@ var controlApp = new Vue({
         worshipItems: [],
         selectedItem: "a",
         verses: {},
+        versePages: [],
         selectedVerse: "",
+        isBlank: false,
         presentationWindow: null,
         current_song_order : '',
         current_song_text : '',
         current_display_title : '',
         current_song_author : '',
         current_song_copyright : ''
+    },
+    watch: {
+        selectedVerse: function(val, oldVal) {
+            // this.selectVerse();
+        }
     },
     methods: {
         loadSets: function() {
@@ -81,7 +90,7 @@ var controlApp = new Vue({
                 this.processText( name );
             } else {
                 // Empty the worship lyrics
-                this.showBlank();
+                // this.toggleBlank();
             }
         },
         isSong: function( songname ) {
@@ -108,7 +117,12 @@ var controlApp = new Vue({
             this.transformSong(data);
         },
         selectVerse: function() {
-            console.log('Selecting verse:', this.selectedVerse);
+            console.log('Selecting verse:', this.selectedVerse, this.versePages[this.selectedVerse]);
+            this.updatePresentation({
+                content: this.versePages[this.selectedVerse],
+                author: this.current_song_author,
+                title: this.current_display_title
+            });
         },
         openPresentationWindow: function(event) {
             if(!this.presentationWindow) {
@@ -132,10 +146,21 @@ var controlApp = new Vue({
                 this.presentationWindow.show();
             }
         },
-        showBlank: function() {
+        toggleBlank: function() {
             console.log('Show blank');
+            this.isBlank = !this.isBlank;
             if(this.presentationWindow) {
-                this.presentationWindow.webContents.send('update-presentation', {});
+                this.presentationWindow.webContents.send('toggle-blank-presentation', this.isBlank);
+            } else {
+                console.log('No presentation window found, cannot blank out the presentation.')
+            }
+            // TODO: Do an overlay instead of emptying the text.
+        },
+        updatePresentation: function(data) {
+            if(this.presentationWindow) {
+                this.presentationWindow.webContents.send('update-presentation', data);
+            } else {
+                console.log('No presentation window found, cannot update presentation.')
             }
         },
         transformSong: function(data) {
@@ -180,11 +205,11 @@ var controlApp = new Vue({
                             current_verse += '_region2';
                         verse_text = []; // Creating a new element, after the old one was assigned
                     } else {
-                        if (line.match("^\\s*$")) // Not sure what this is checking for...
+                        if (line.match("^\\s*$")) // Checking for blank/empty lines
                         {
-                            if (verse_text.lastChild) // && verse_text.lastChild.tagName != 'br')
+                            if (verse_text.length > 0 ) // Check if it has some content // (verse_text.lastChild) // && verse_text.lastChild.tagName != 'br')
                             {
-                                verse_text.push('---');
+                                verse_text.push(NEW_PAGE_INDICATOR);
                             // verse_text.appendChild( document.createElementNS('http://www.w3.org/1999/xhtml','hr') );
                             }
                         } else {
@@ -208,6 +233,7 @@ var controlApp = new Vue({
             
             // Then, if an order is set, add the verses in the order decided
             var transformed = '';
+            var versePages = [];
             if (order) {
                 for (var index in order) {
                     //console.log('Index is '+index);
@@ -219,108 +245,139 @@ var controlApp = new Vue({
                         index = verse_map[verse_num]; 
                     }
                     if (verses[index]) { 
-                        // this._transform_verse(index, verses);
+                        var newVersePages = this.transformVerse(index, verses);
+                        versePages = versePages.concat(newVersePages);
                     }
                 }
-                // If no order is set, just print the verses by their order in the file
+            // If no order is set, just print the verses by their order in the file
             } else {
                 for (var index in verses) {
-                    // this._transform_verse(index, verses,);
+                    var newVersePages = this.transformVerse(index, verses);
+                    versePages = versePages.concat(newVersePages);
                 }
             }
-            this.verses = verses;
-            this.selectedVerse = Object.keys(verses)[0];
-            this.selectVerse();
+            this.verses = verses; // Update the verses
+            // console.log('verses', verses);
+            this.versePages = versePages; 
+            console.log('versepages', versePages);
+            this.selectedVerse = versePages[0].key; // Update the selectedVerse
+            this.selectVerse(); // Call the selectVerse method which updates the view (if there is one)
             //transformed = transformed.replace(empty_verses_regexp,'');
             // return transformed;
         },
-        _transform_verse : function( index, verses ) { // Maybe deprecated, since this is mostly generating markup
-            if (index.slice(-8) == '_region2')
-            return;
-            var verse = verses[index].cloneNode(true);
-            var item = document.createElement('richlistitem');
-            item.setAttribute('orient','vertical');
-            var verse_num = document.createElement('description');
-            verse_num.setAttribute('class','identifier');
-            if (parseInt(index) == index) {
-                var span = document.createElement('span');
-                span.setAttribute('class','underline');
-                span.appendChild( document.createTextNode(index) );
-                verse_num.appendChild( document.createTextNode('Verse ') );
-                verse_num.appendChild( span );
-                verse_num.appendChild( document.createTextNode(':') );
-            } else {
-                verse_num.appendChild( document.createTextNode( index.charAt(0).toUpperCase() + index.slice(1) + ':')  );
-            } 
-            item.appendChild(verse_num);
-            var desc = document.createElement('description');
+        transformVerse : function( index, verses ) { 
             
-            if (!verses[index+'_region2']) {
-                for (var index = 0; index < verse.childNodes.length; index++) {
-                    var child = verse.childNodes[index];
-                    if (child.tagName != 'hr')
-                    desc.appendChild( child.cloneNode(true) );
-                    else if (desc.hasChildNodes()) {
+            if (index.slice(-8) == '_region2') return {}; // We don't deal with region2 verses, as they'll be dealt with in the original verse
+
+            var verse = verses[index];
+
+            // var item = document.createElement('richlistitem');
+            // item.setAttribute('orient','vertical');
+            
+            // Verse numbering handled in template
+            // var verse_num = document.createElement('description');
+            // verse_num.setAttribute('class','identifier');
+            
+            // if (parseInt(index) == index) { // This is a verse ?
+            //     var span = document.createElement('span');
+            //     span.setAttribute('class','underline');
+            //     span.appendChild( document.createTextNode(index) );
+            //     verse_num.appendChild( document.createTextNode('Verse ') );
+            //     verse_num.appendChild( span );
+            //     verse_num.appendChild( document.createTextNode(':') );
+            // } else {
+            //     verse_num.appendChild( document.createTextNode( index.charAt(0).toUpperCase() + index.slice(1) + ':')  );
+            // } 
+            // item.appendChild(verse_num);
+
+            var versePages = [];
+            var versePage = {
+                key: '',
+                lines: []
+            }; // A page of a verse, there's a new page after an empty line.
+            var pageSuffix = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+            
+            if (!verses[index+'_region2']) { // There's no region 2 defined for the text
+                var pageCounter = 0;
+                for (var j = 0; j < verse.length; j++) {
+                    var line = verse[j];
+                    if (line != NEW_PAGE_INDICATOR) {
+                        versePage.lines.push( line );
+                    } else if (versePage.lines.length > 0) {
+                        var key = index;
+                        if(pageCounter > 0) {
+                            key += pageSuffix[pageCounter]
+                        }
+                        versePage.key = key;
+                        versePages.push(versePage);
+                        pageCounter++;
+                        versePage = { key: '', lines: [] }; // Prepare for a new page
+                    }
+                }
+            } else {
+                
+                var region2_size;
+                try {
+                    region2_size = WorshipSlides.MainWindow.getIntPref('region2_size');
+                } catch (error) {}
+                if (!region2_size)
+                    region2_size = 100;
+                    
+                var region2 = verses[index+'_region2'];
+                var reg1_part = 0;
+                var reg2_part = 0;
+                var failsafe = 0;
+                while (reg1_part < verse.childNodes.length || reg2_part < region2.childNodes.length)
+                {
+                    if (failsafe++ > verse.childNodes + region2.childNodes)
+                    break;
+                    if (verse.childNodes[reg1_part] && verse.childNodes[reg1_part].tagName != 'br' && verse.childNodes[reg1_part].tagName != 'hr') {
+                    desc.appendChild( verse.childNodes[reg1_part].cloneNode(true) );
+                    desc.appendChild( document.createElementNS('http://www.w3.org/1999/xhtml','br') );
+                    reg1_part++;
+                    }
+                    if (region2.childNodes[reg2_part] && region2.childNodes[reg2_part].tagName != 'br' && region2.childNodes[reg2_part].tagName != 'hr') {
+                    var span = document.createElement('span');
+                    span.setAttribute('style','font-size: '+region2_size+'%;');
+                    span.appendChild( region2.childNodes[reg2_part].cloneNode(true) );
+                    desc.appendChild( span );
+                    desc.appendChild( document.createElementNS('http://www.w3.org/1999/xhtml','br') );
+                    reg2_part++;
+                    }
+                    if (verse.childNodes[reg1_part] && verse.childNodes[reg1_part].tagName == 'br')
+                    reg1_part++;
+                    if (region2.childNodes[reg2_part] && region2.childNodes[reg2_part].tagName == 'br')
+                    reg2_part++;
+                    if ((!verse.childNodes[reg1_part] || verse.childNodes[reg1_part].tagName == 'hr') &&
+                    (!region2.childNodes[reg2_part] || region2.childNodes[reg2_part].tagName == 'hr')) {
                     item.appendChild( desc );
                     listbox.appendChild( item );
                     item = document.createElement('richlistitem');
                     desc = document.createElement('description');
+                    reg1_part++;
+                    reg2_part++;
                     }
                 }
-            } else {
-            
-            var region2_size;
-            try {
-                region2_size = WorshipSlides.MainWindow.getIntPref('region2_size');
-            } catch (error) {}
-            if (!region2_size)
-                region2_size = 100;
-                
-            var region2 = verses[index+'_region2'];
-            var reg1_part = 0;
-            var reg2_part = 0;
-            var failsafe = 0;
-            while (reg1_part < verse.childNodes.length || reg2_part < region2.childNodes.length)
-            {
-                if (failsafe++ > verse.childNodes + region2.childNodes)
-                break;
-                if (verse.childNodes[reg1_part] && verse.childNodes[reg1_part].tagName != 'br' && verse.childNodes[reg1_part].tagName != 'hr') {
-                desc.appendChild( verse.childNodes[reg1_part].cloneNode(true) );
-                desc.appendChild( document.createElementNS('http://www.w3.org/1999/xhtml','br') );
-                reg1_part++;
-                }
-                if (region2.childNodes[reg2_part] && region2.childNodes[reg2_part].tagName != 'br' && region2.childNodes[reg2_part].tagName != 'hr') {
-                var span = document.createElement('span');
-                span.setAttribute('style','font-size: '+region2_size+'%;');
-                span.appendChild( region2.childNodes[reg2_part].cloneNode(true) );
-                desc.appendChild( span );
-                desc.appendChild( document.createElementNS('http://www.w3.org/1999/xhtml','br') );
-                reg2_part++;
-                }
-                if (verse.childNodes[reg1_part] && verse.childNodes[reg1_part].tagName == 'br')
-                reg1_part++;
-                if (region2.childNodes[reg2_part] && region2.childNodes[reg2_part].tagName == 'br')
-                reg2_part++;
-                if ((!verse.childNodes[reg1_part] || verse.childNodes[reg1_part].tagName == 'hr') &&
-                (!region2.childNodes[reg2_part] || region2.childNodes[reg2_part].tagName == 'hr')) {
-                item.appendChild( desc );
-                listbox.appendChild( item );
-                item = document.createElement('richlistitem');
-                desc = document.createElement('description');
-                reg1_part++;
-                reg2_part++;
-                }
             }
+            if (versePage.lines.length > 0) {
+                versePage.key = index;
+                versePages.push(versePage);
+                versePage = []; // This line does nothing?
             }
-            if (desc.hasChildNodes()) {
-                item.appendChild( desc );
-                listbox.appendChild( item );
-                item = document.createElement('richlistitem');
-                desc = document.createElement('description');
-            }
+            console.log(versePages);
+            return versePages;
         }
     },
     beforeMount: function() {
         this.loadSets();
     }
 })
+
+// ipcRenderer.on('file-updated', function (event, filename) {
+//     console.log('Song has been updated:', data);
+//     if(filename) {
+//         if(filename == selectedItem) {
+//             selectItem(); // Triggers reload of data.
+//         }
+//     }
+// });
