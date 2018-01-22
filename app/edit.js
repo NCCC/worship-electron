@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 17);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -11499,7 +11499,13 @@ return Vue$3;
 
 
 /***/ }),
-/* 11 */
+/* 11 */,
+/* 12 */,
+/* 13 */,
+/* 14 */,
+/* 15 */,
+/* 16 */,
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11519,433 +11525,169 @@ var _url = _interopRequireDefault(__webpack_require__(4));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const electron = window.require('electron');
+const electron = __webpack_require__(0);
 
 const BrowserWindow = electron.remote.BrowserWindow;
 const app = electron.remote.app;
 
 const appDir = _fsJetpack.default.cwd(app.getAppPath());
 
-var song_order_regexp = /# *Order: *([0-9,a-z]+)/;
-var song_title_regexp = /# *Title: *(.+)/;
-var song_author_regexp = /# *Author: *(.+)/;
-var song_copyright_regexp = /# *Copyright: *(.+)/;
-var song_verse_regexp = /^\[(.+)\]$/;
-var empty_verses_regexp = /<p class="listitem">\s*<\/p>/g;
-var verse_map = {
-  c: 'chorus',
-  t: 'chorus 2',
-  p: 'prechorus',
-  b: 'bridge',
-  w: 'bridge 2',
-  e: 'ending'
-};
-const NEW_PAGE_INDICATOR = '---';
-const REGION2_INDICATOR = '+';
-var controlApp = new _vueAlias.default({
-  el: '#control',
+const ipcRenderer = electron.ipcRenderer;
+var editApp = new _vueAlias.default({
+  el: '#edit',
   data: {
-    worshipSets: ["a", "b", "c"],
-    selectedSet: "a",
-    worshipItems: [],
-    selectedItem: "a",
-    verses: {},
-    versePages: [],
-    selectedVerse: 0,
-    isBlank: false,
-    presentationWindow: null,
-    editWindow: null,
-    current_song_order: '',
-    current_song_text: '',
-    current_display_title: '',
-    current_song_author: '',
-    current_song_copyright: '',
-    REGION2_INDICATOR: REGION2_INDICATOR
-  },
-  watch: {
-    selectedVerse: function (val, oldVal) {// this.selectVerse();
-    }
+    songname: '',
+    oldSongname: '',
+    songPath: ''
   },
   methods: {
-    loadSets: function () {
-      var setpath = 'userdata/sets';
-      var fileList = appDir.list(setpath);
+    saveSong: function (event) {
+      //   var items_el = window.opener.document.getElementById('worship_items');
+      var songpath = this.songpath; //WorshipSlides.MainWindow.getPref('songpath');
+      //   var songFile = new FileUtils.File(songpath);
+      //   if (!songFile.exists() || !songFile.isWritable())
+      //   {
+      //     prompts.alert(window,"Invalid song path!","You must set a valid song path in Configuration before you can add songs!");
+      //     return false;
+      //   }
 
-      if (fileList) {
-        this.worshipSets = fileList.filter(x => x.slice(-4) == '.txt').map(x => x.slice(0, -4));
-        this.selectedSet = this.worshipSets[0]; // TODO: Retrieve from cache
+      if (this.songname == "") {
+        alert("You must add a song title before you can save the song.");
+        return false;
+      } // If name was changed, rename the old file
+      //   var oldSongname = WorshipSlides.EditSongWindow.song_last_title;
+      //if (oldSongFile.exists() && oldSongFile.toLowerCase() != songFile.toLowerCase())
 
-        this.selectSet();
+
+      if (this.oldSongname != "" && this.oldSongname != this.songname) {
+        try {
+          appDir.rename(this.oldSongname + '.txt', this.songname + '.txt');
+        } catch (err) {
+          prompts.alert(window, "Error while renaming song.", "An error occured when trying to rename this song. Maybe the song already exists?");
+          return false;
+        } // Saving worked! Update "last song name" to current name.
+
+
+        this.oldSongname = songname; // Also change the item in the list to the new name
+
+        for (var index = 0; index < items_el.itemCount; index++) if (items_el.getItemAtIndex(index).label == oldSongname) items_el.getItemAtIndex(index).label = songname;
+
+        window.opener.WorshipSlides.MainWindow.saveSet();
+      } else songFile.append(songname + '.txt'); // If this is a new file, add it to the worship items list
+
+
+      if (!songFile.exists()) {
+        items_el.appendItem(songname);
+        window.opener.WorshipSlides.MainWindow.saveSet();
       }
 
-      console.log('Setlist loaded.');
-    },
-    selectSet: function (event) {
-      var setname = this.selectedSet;
-      console.log('Selecting set:', setname);
-      var setfile = appDir.read('userdata/sets/' + setname + '.txt'); // console.log('Set: ', setfile);
-
-      if (setfile) {
-        var data = setfile;
-        var worship_items = document.getElementById('worship_items'); //     while (worship_items.hasChildNodes())
-        //       worship_items.removeItemAt(0);
-
-        if (data) {
-          var lines = data.split(/\r?\n/);
-          this.worshipItems = lines.filter(x => x !== '');
+      var ostream = FileUtils.openAtomicFileOutputStream(songFile, FileUtils.MODE_CREATE | FileUtils.MODE_WRONLY);
+      var converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+      converter.charset = "UTF-8";
+      console.log('fileutils initiated');
+      var song_text_el = document.getElementById('worship_song_text');
+      var song_order_el = document.getElementById('worship_song_order');
+      var song_display_el = document.getElementById('worship_display_title');
+      var song_author_el = document.getElementById('worship_song_author');
+      var song_copyright_el = document.getElementById('worship_song_copyright');
+      var song_text = '# Order: ' + song_order_el.value + "\r\n";
+      if (song_display_el.value != '') song_text += '# Title: ' + song_display_el.value + "\r\n";
+      if (song_author_el.value != '') song_text += '# Author: ' + song_author_el.value + "\r\n";
+      if (song_copyright_el.value != '') song_text += '# Copyright: ' + song_copyright_el.value + "\r\n";
+      song_text += song_text_el.value;
+      var istream = converter.convertToInputStream(song_text);
+      console.log('finished building song');
+      NetUtil.asyncCopy(istream, ostream, function (status) {
+        if (!Components.isSuccessCode(status)) {
+          prompts.alert(window, 'Worship Slides: Error saving', 'Error saving song.');
+          return;
         }
 
-        this.selectedItem = this.worshipItems[0]; // TODO: Retrieve from cache                
-
-        this.selectItem();
-      }
-    },
-    saveSet: function () {
-      console.log("Saving set now...");
-      var setpath = 'userdata/sets'; // TODO: Load setpath
-
-      if (!appDir.exists(setpath)) {
-        prompts.alert(window, "Invalid worship set path!", "You must configure a valid worship set path in Configuration before you can save song sets!"); //console.log('No worship set path!');
-
-        return false;
-      }
-
-      var setlist = document.getElementById('worship_sets_list');
-      var setname = this.selectedSet;
-
-      if (setname == "") {
-        prompts.alert(window, "Set title must be set", "You must select a worship set name before you can save worship sets."); //console.log('No set name!');
-
-        return false;
-      }
-
-      var set_text = this.worshipItems.join('\n');
-      console.log("Set Saving - Text for saving:", set_text); // appDir.write(`${setpath}/${setname}.txt`, set_text);
-      // NetUtil.asyncCopy(istream, ostream, function(status) {
-      //     //console.log("Save status: "+status);
-      //     if (!Components.isSuccessCode(status)) {
-      //         prompts.alert(window,'Worship Slides: Error saving set','Error saving worship set!');
-      //         return;
-      //     }
-      // });
-
+        prompts.alert(window, 'Worship Slides: Saved successfully', 'Song has been saved.');
+        WorshipSlides.EditSongWindow.edited = false;
+        window.opener.WorshipSlides.MainWindow.showLyrics(songname);
+        WorshipSlides.EditSongWindow.song_last_title = songname;
+      });
+      console.log('asyncCopy started');
       return false;
     },
-    removeItem: function (event) {
-      var index = this.worshipItems.indexOf(this.selectedItem);
+    addSection: function (type) {
+      var song_text_el = document.getElementById('worship_song_text');
+      var text_before = song_text_el.value.substr(0, song_text_el.selectionStart);
+      var text_after = song_text_el.value.substr(song_text_el.selectionStart);
+      var insert = '';
 
-      if (index > -1) {
-        this.worshipItems.splice(index, 1);
-        this.saveSet();
+      switch (type) {
+        case 'verse':
+          var num = 1;
 
-        if (index > 0) {
-          this.selectedItem = this.worshipItems[index - 1];
-        } else if (this.worshipItems.length > 0) {
-          this.selectedItem = index;
+          while (song_text_el.value.indexOf('[' + num + ']') > -1) num++;
+
+          insert = '[' + num + ']\n';
+          break;
+
+        case 'chorus':
+          if (song_text_el.value.indexOf('[chorus]') == -1) insert = '[chorus]\n';else insert = '[chorus 2]\n';
+          break;
+
+        case 'bridge':
+          if (song_text_el.value.indexOf('[bridge]') == -1) insert = '[bridge]\n';else insert = '[bridge 2]\n';
+          break;
+
+        default:
+          insert = '[' + type + ']\n';
+      }
+
+      var pos = song_text_el.selectionStart + insert.length;
+      song_text_el.value = text_before + insert + text_after;
+      song_text_el.selectionStart = pos;
+      song_text_el.selectionEnd = pos;
+      song_text_el.focus();
+    },
+    addOrder: function (type) {
+      // TODO: Test and fix
+      var song_order_el = document.getElementById('worship_song_order');
+      if (song_order_el.value.trim().length != 0 && song_order_el.value.trim().substr(-1) != ',') song_order_el.value += ',';
+      song_order_el.value += type;
+      WorshipSlides.EditSongWindow.updatePreview(null);
+    },
+    searchSongInfo: function () {
+      // TODO: Test and fix
+      var song_text_el = document.getElementById('worship_song_text');
+      var lines = song_text_el.value.split('\n');
+      var counter = 0;
+      var search_string = '';
+
+      for (var line_index = 0; line_index < lines.length; line_index++) {
+        if (lines[line_index].substr(0, 1) != '[') {
+          search_string += lines[line_index] + ' ';
+          counter++;
+          if (counter > 3) break;
         }
       }
 
-      this.selectItem(event);
+      this.search_window = window.open('http://us.search.ccli.com/search/results?SearchText=' + encodeURI(search_string), 'ccli_search_window');
     },
-    selectItem: function (event) {
-      console.log('Selecting item:', this.selectedItem);
-      var name = this.selectedItem;
+    fetchSongInfo: function () {
+      // TODO: Test and fix
+      console.debug(this.search_window);
 
-      if (this.isSong(name)) {
-        this.processLyrics(name);
-      } else if (this.isText(name)) {
-        this.processText(name);
-      } else {
-        // Empty the worship lyrics
-        // this.toggleBlank();
-        console.log('File not found');
+      if (this.search_window && !this.search_window.closed) {
+        var authors_result = /Authors<\/h4>\n(.+)/m.exec(this.search_window.document.body.innerHTML);
+        var copyright_result = /Copyrights<\/h4>\n.+(\d{4}[^(&]+)/m.exec(this.search_window.document.body.innerHTML);
+        console.log("Search for authors: " + authors_result);
+        console.log("Search for copyright: " + copyright_result);
+        var authors = '',
+            copyright = '';
+        if (authors_result) authors = authors_result[1].replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+        if (copyright_result) copyright = copyright_result[1].replace(/\s+/g, ' ').trim();
+        if (authors.length > 0) document.getElementById('worship_song_author').value = authors;
+        if (copyright.length > 0) document.getElementById('worship_song_copyright').value = copyright;
       }
-    },
-    isSong: function (songname) {
-      // TODO: Config songs-path
-      return appDir.exists('userdata/songs/' + songname + '.txt');
-    },
-    isText: function (textname) {
-      // TODO: Config text-path
-      return appDir.exists('userdata/texts/' + textname + '.txt');
-    },
-    processLyrics: function (songname) {
-      // TODO: Config songs-path
-      var data = appDir.read('userdata/songs/' + songname + '.txt');
-      this.current_display_title = songname;
-      this.transformSong(data); // var worship_lyrics = document.getElementById('worship_lyrics');
-      // worship_lyrics.selectedIndex = 0;
-      // WorshipSlides.MainWindow.checkExport(); // What's this?
-    },
-    processText: function (textname) {
-      var data = appDir.read('userdata/texts/' + textname + '.txt');
-      this.current_display_title = textname;
-      this.transformSong(data);
-    },
-    selectVerse: function () {
-      console.log('Selecting verse:', this.selectedVerse, this.versePages[this.selectedVerse]);
-      this.updatePresentation({
-        content: this.versePages[this.selectedVerse],
-        author: this.current_song_author,
-        title: this.current_display_title
-      });
-    },
-    openPresentationWindow: function (event) {
-      if (!this.presentationWindow) {
-        this.presentationWindow = new BrowserWindow({
-          width: 1000,
-          height: 600,
-          show: false
-        });
-        this.presentationWindow.on('closed', () => {
-          this.presentationWindow = null;
-        });
-        this.presentationWindow.loadURL(_url.default.format({
-          pathname: _path.default.join(__dirname, "presentation.html"),
-          protocol: "file:",
-          slashes: true
-        }));
-        this.presentationWindow.once('ready-to-show', () => {
-          this.selectVerse();
-          this.presentationWindow.show();
-        });
-      } else {
-        this.presentationWindow.show();
-      }
-    },
-    openEditWindow: function (event) {
-      if (!this.editWindow) {
-        this.editWindow = new BrowserWindow({
-          width: 1000,
-          height: 600,
-          show: false
-        });
-        this.editWindow.on('closed', () => {
-          this.editWindow = null;
-        });
-        this.editWindow.loadURL(_url.default.format({
-          pathname: _path.default.join(__dirname, "edit.html"),
-          protocol: "file:",
-          slashes: true
-        }));
-        this.editWindow.once('ready-to-show', () => {
-          // Load a song or a text
-          this.editWindow.show();
-        });
-      } else {
-        this.editWindow.show();
-      }
-    },
-    toggleBlank: function () {
-      console.log('Show blank');
-      this.isBlank = !this.isBlank;
-
-      if (this.presentationWindow) {
-        this.presentationWindow.webContents.send('toggle-blank-presentation', this.isBlank);
-      } else {
-        console.log('No presentation window found, cannot blank out the presentation.');
-      } // TODO: Do an overlay instead of emptying the text.
-
-    },
-    updatePresentation: function (data) {
-      if (this.presentationWindow) {
-        this.presentationWindow.webContents.send('update-presentation', data);
-      } else {
-        console.log('No presentation window found, cannot update presentation.');
-      }
-    },
-    transformSong: function (data) {
-      var lines = data.split(/\r?\n/);
-      var verses = {};
-      var current_verse = 1;
-      var verse_text = [];
-      var order = null;
-      this.current_song_order = '';
-      this.current_song_text = '';
-      this.current_song_author = '';
-      this.current_song_copyright = ''; //this.current_display_title = '';
-      // First we get all the verses from the text
-
-      for (index = 0; index < lines.length; index++) {
-        var line = lines[index];
-
-        if (line.substr(0, 1) == "#") {
-          var matches = song_order_regexp.exec(line);
-
-          if (matches) {
-            this.current_song_order = matches[1];
-            order = matches[1].split(',');
-          } else if (matches = song_title_regexp.exec(line)) this.current_display_title = matches[1];else if (matches = song_author_regexp.exec(line)) this.current_song_author = matches[1];else if (matches = song_copyright_regexp.exec(line)) this.current_song_copyright = matches[1];else if (line.substring(0, 1) != '#') this.current_song_text += line + "\n";
-        } else {
-          if (line || this.current_song_text != '') this.current_song_text += line + "\n";
-
-          if (matches = song_verse_regexp.exec(line)) {
-            // New verse detected
-            if (verse_text.length > 0) verses[current_verse] = verse_text;
-            if (matches[1] != 'region 2') current_verse = matches[1];else current_verse += '_region2';
-            verse_text = []; // Creating a new element, after the old one was assigned
-          } else {
-            if (line.match("^\\s*$")) // Checking for blank/empty lines
-              {
-                if (verse_text.length > 0) // Check if it has some content // (verse_text.lastChild) // && verse_text.lastChild.tagName != 'br')
-                  {
-                    verse_text.push(NEW_PAGE_INDICATOR); // verse_text.appendChild( document.createElementNS('http://www.w3.org/1999/xhtml','hr') );
-                  }
-              } else {
-              verse_text.push(line); // verse_text.appendChild( document.createTextNode(line) );
-              // verse_text.appendChild( document.createElementNS('http://www.w3.org/1999/xhtml','br') );
-            }
-          }
-        }
-      } // End of for-loop
-      // Save any unsaved verses here
-
-
-      if (current_verse != null) verses[current_verse] = verse_text;else if (verse_text.length > 0) verses[verse_num] = verse_text; // Strip away last newline
-
-      if (this.current_song_text.slice(-1) == "\n") this.current_song_text = this.current_song_text.slice(0, -1); // Then, if an order is set, add the verses in the order decided
-
-      var transformed = '';
-      var versePages = [];
-
-      if (order) {
-        for (var index in order) {
-          //console.log('Index is '+index);
-          var verse_num = order[index]; //console.log('Verse num is '+verse_num);
-
-          if (parseInt(verse_num) == verse_num) {
-            index = verse_num;
-          } else {
-            index = verse_map[verse_num];
-          }
-
-          if (verses[index]) {
-            var newVersePages = this.transformVerse(index, verses);
-
-            if (newVersePages) {
-              versePages = versePages.concat(newVersePages);
-            }
-          }
-        } // If no order is set, just print the verses by their order in the file
-
-      } else {
-        for (var index in verses) {
-          var newVersePages = this.transformVerse(index, verses);
-
-          if (newVersePages) {
-            versePages = versePages.concat(newVersePages);
-          }
-        }
-      }
-
-      this.verses = verses; // Update the verses
-      // console.log('verses', verses);
-
-      this.versePages = versePages;
-      console.log('versepages', versePages);
-      this.selectedVerse = 0; // Update the selectedVerse
-
-      this.selectVerse(); // Call the selectVerse method which updates the view (if there is one)
-      //transformed = transformed.replace(empty_verses_regexp,'');
-      // return transformed;
-    },
-    transformVerse: function (index, verses) {
-      if (index.slice(-8) == '_region2') return; // We don't deal with region2 verses, as they'll be dealt with in the original verse
-
-      var verse = verses[index];
-      var versePages = [];
-      var versePage = {
-        key: '',
-        lines: []
-      }; // A page of a verse, there's a new page after an empty line.
-
-      var pageCounter = 0;
-      var pageSuffix = 'abcdefghijklmnopqrstuvwxyz';
-
-      if (!verses[index + '_region2']) {
-        // There's no region 2 defined for the text
-        for (var j = 0; j < verse.length; j++) {
-          var line = verse[j];
-
-          if (line != NEW_PAGE_INDICATOR) {
-            versePage.lines.push(line);
-          } else if (versePage.lines.length > 0) {
-            var key = index;
-
-            if (pageCounter > 0) {
-              key += pageSuffix[pageCounter];
-            }
-
-            versePage.key = key;
-            versePages.push(versePage);
-            pageCounter++;
-            versePage = {
-              key: '',
-              lines: []
-            }; // Prepare for a new page
-          }
-        }
-      } else {
-        var region2 = verses[index + '_region2'];
-        var reg1_part = 0;
-        var reg2_part = 0;
-        var failsafe = 0;
-
-        while (reg1_part < verse.length || reg2_part < region2.length) {
-          if (failsafe++ > verse.childNodes + region2.childNodes) break;
-
-          if (verse[reg1_part] && verse[reg1_part] !== NEW_PAGE_INDICATOR) {
-            versePage.lines.push(verse[reg1_part]);
-            reg1_part++;
-          }
-
-          if (region2[reg2_part] && region2[reg2_part] !== NEW_PAGE_INDICATOR) {
-            versePage.lines.push(REGION2_INDICATOR + region2[reg2_part]);
-            reg2_part++;
-          }
-
-          if ((!verse[reg1_part] || verse[reg1_part] === NEW_PAGE_INDICATOR) && (!region2[reg2_part] || region2[reg2_part] === NEW_PAGE_INDICATOR)) {
-            var key = index;
-
-            if (pageCounter > 0) {
-              key += pageSuffix[pageCounter];
-            }
-
-            versePage.key = key;
-            versePages.push(versePage);
-            pageCounter++;
-            versePage = {
-              key: '',
-              lines: []
-            }; // Prepare for a new page
-
-            reg1_part++;
-            reg2_part++;
-          }
-        }
-      }
-
-      if (versePage.lines.length > 0) {
-        versePage.key = index;
-        versePages.push(versePage);
-      }
-
-      console.log('Transform Verse:', versePages);
-      return versePages;
     }
-  },
-  beforeMount: function () {
-    this.loadSets();
   }
-}); // ipcRenderer.on('file-updated', function (event, filename) {
-//     console.log('Song has been updated:', data);
-//     if(filename) {
-//         if(filename == selectedItem) {
-//             selectItem(); // Triggers reload of data.
-//         }
-//     }
-// });
+});
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=control.js.map
+//# sourceMappingURL=edit.js.map

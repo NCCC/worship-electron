@@ -8,10 +8,17 @@
 </head>
 <body>
     <div class="flex flex--v" id="presentation">
-        <div class="flex__main">
-            <p v-for="line in content" class="">{{line}}</p>
+        <div class="flex__main" id="content">
+            <template v-for="line in content.lines">
+                <div v-if="line.slice(0,1) === REGION2_INDICATOR" class="line--region2">
+                    {{line.slice(1)}}
+                </div>
+                <div v-else>
+                    {{line}}
+                </div>
+            </template>
         </div>
-        <div class="flex">
+        <div class="flex presentation__info">
             <div class="flex__main">{{title}}</div>
             <div>{{author}}</div>
         </div>

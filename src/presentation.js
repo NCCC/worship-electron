@@ -11,6 +11,7 @@ const BrowserWindow = electron.remote.BrowserWindow;
 const app = electron.remote.app;
 const appDir = jetpack.cwd(app.getAppPath());
 const ipcRenderer = electron.ipcRenderer;
+const minFontSize = 12;
 
 var presentationApp = new Vue({
     el: '#presentation',
@@ -18,7 +19,28 @@ var presentationApp = new Vue({
         content: ['content-placeholder'],
         title: 'title-placeholder',
         author: 'author-placeholder',
-        isBlank: false
+        isBlank: false,
+        REGION2_INDICATOR: '+'
+    },
+    updated: function() {
+        // After a data change causes DOM to update, fit the text to the container
+        this.fitText();
+    },
+    methods: {
+        fitText: function() {
+            // this.el.style.setPropterty
+            const content = this.$el.childNodes[0];
+            function resizeText() {
+                content.style.setProperty('--font-size', `${fontSize--}px`);
+            }
+            let fontSize = 72; //parseInt( getComputedStyle(content).getPropertyValue('--font-size').slice(0, -2) );
+            resizeText();
+            console.log('Font Size started at: ', fontSize, content.scrollHeight, content.offsetHeight);
+            while(content.scrollHeight > content.offsetHeight && fontSize > minFontSize && fontSize < 200) {
+                console.log(content.scrollHeight, content.offsetHeight);    
+                resizeText();
+            }
+        }
     }
 })
 

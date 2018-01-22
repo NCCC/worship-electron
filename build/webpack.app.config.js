@@ -8,6 +8,7 @@ module.exports = env => {
       control: "./src/control.js",
       presentation: "./src/presentation.js",
       background: "./src/background.js",
+      edit: "./src/edit.js",
       app: "./src/app.js"
     },
     output: {

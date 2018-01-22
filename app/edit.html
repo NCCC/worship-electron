@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Worship Slides - Edit</title>
+</head>
+<body>
+    <div class="flex--v" style="height: 100%" id="edit">
+        <h1>Edit</h1>
+        <div>
+            <label>Song title (shown in list)</label><br>
+            <input type="text">
+        </div>
+        <div>
+            <label>Song lyrics</label><br>
+            <div>
+                <button @click="addSection('verse');">Verse</button>
+                <button @click="addSection('region 2');">Region 2</button>
+                <button @click="addSection('prechorus');">Prechorus</button>
+                <button @click="addSection('chorus');">Chorus</button>
+                <button @click="addSection('bridge');">Bridge</button>
+                <button @click="addSection('ending');">Ending</button>
+            </div>
+        </div>
+        <textarea class="flex__main" id="worship_song_text"></textarea>
+        <div>
+            <label>Display title (shown on the slides)</label><br>
+            <input type="text">
+        </div>
+        <div>
+            <label>Author</label><br>
+            <input type="text">
+        </div>
+        <div>
+            <label>Copyright</label><br>
+            <input type="text">
+        </div>
+    </div>
+    <script>
+    require('./edit.js');
+    </script>
+</body>
+</html>

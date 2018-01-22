@@ -37,14 +37,16 @@ var controlApp = new Vue({
         selectedItem: "a",
         verses: {},
         versePages: [],
-        selectedVerse: "",
+        selectedVerse: 0,
         isBlank: false,
         presentationWindow: null,
+        editWindow: null,
         current_song_order : '',
         current_song_text : '',
         current_display_title : '',
         current_song_author : '',
-        current_song_copyright : ''
+        current_song_copyright : '',
+        REGION2_INDICATOR: REGION2_INDICATOR
     },
     watch: {
         selectedVerse: function(val, oldVal) {
@@ -81,6 +83,50 @@ var controlApp = new Vue({
                 this.selectItem();
             }
         },
+        saveSet: function() {
+            console.log("Saving set now...");
+            var setpath = 'userdata/sets'; // TODO: Load setpath
+            if (!appDir.exists(setpath)) {
+                prompts.alert(window,"Invalid worship set path!","You must configure a valid worship set path in Configuration before you can save song sets!");
+                //console.log('No worship set path!');
+                return false;
+            }
+            var setlist = document.getElementById('worship_sets_list');
+            var setname = this.selectedSet;
+            if (setname == "")
+            {
+                prompts.alert(window,"Set title must be set","You must select a worship set name before you can save worship sets.");
+                //console.log('No set name!');
+                return false;
+            }
+            
+            var set_text = this.worshipItems.join('\n');
+            console.log("Set Saving - Text for saving:", set_text);
+            
+            // appDir.write(`${setpath}/${setname}.txt`, set_text);
+            
+            // NetUtil.asyncCopy(istream, ostream, function(status) {
+            //     //console.log("Save status: "+status);
+            //     if (!Components.isSuccessCode(status)) {
+            //         prompts.alert(window,'Worship Slides: Error saving set','Error saving worship set!');
+            //         return;
+            //     }
+            // });
+            return false;
+        },
+        removeItem: function(event) {
+            var index = this.worshipItems.indexOf(this.selectedItem);
+            if (index > -1) {
+                this.worshipItems.splice(index, 1);
+                this.saveSet();
+                if (index > 0) {
+                    this.selectedItem = this.worshipItems[index-1];
+                } else if (this.worshipItems.length > 0) {
+                    this.selectedItem = index;
+                }
+            }
+            this.selectItem(event);
+        },
         selectItem: function(event) {
             console.log('Selecting item:', this.selectedItem);
             var name = this.selectedItem;
@@ -91,6 +137,7 @@ var controlApp = new Vue({
             } else {
                 // Empty the worship lyrics
                 // this.toggleBlank();
+                console.log('File not found');
             }
         },
         isSong: function( songname ) {
@@ -128,7 +175,8 @@ var controlApp = new Vue({
             if(!this.presentationWindow) {
                 this.presentationWindow = new BrowserWindow({
                     width: 1000,
-                    height: 600
+                    height: 600,
+                    show: false
                   });
                 this.presentationWindow.on('closed', () => {
                     this.presentationWindow = null
@@ -140,10 +188,39 @@ var controlApp = new Vue({
                         protocol: "file:",
                         slashes: true
                     })
-                );   
-
+                );
+                this.presentationWindow.once('ready-to-show', () => {
+                    this.selectVerse();
+                    this.presentationWindow.show();
+                });
             } else {
                 this.presentationWindow.show();
+            }
+        },
+        openEditWindow: function(event) {
+            if(!this.editWindow) {
+                this.editWindow = new BrowserWindow({
+                    width: 1000,
+                    height: 600,
+                    show: false
+                  });
+                this.editWindow.on('closed', () => {
+                    this.editWindow = null
+                })
+        
+                this.editWindow.loadURL(
+                    url.format({
+                        pathname: path.join(__dirname, "edit.html"),
+                        protocol: "file:",
+                        slashes: true
+                    })
+                );
+                this.editWindow.once('ready-to-show', () => {
+                    // Load a song or a text
+                    this.editWindow.show();
+                });
+            } else {
+                this.editWindow.show();
             }
         },
         toggleBlank: function() {
@@ -246,59 +323,44 @@ var controlApp = new Vue({
                     }
                     if (verses[index]) { 
                         var newVersePages = this.transformVerse(index, verses);
-                        versePages = versePages.concat(newVersePages);
+                        if(newVersePages) {
+                            versePages = versePages.concat(newVersePages);
+                        }
                     }
                 }
             // If no order is set, just print the verses by their order in the file
             } else {
                 for (var index in verses) {
                     var newVersePages = this.transformVerse(index, verses);
-                    versePages = versePages.concat(newVersePages);
+                    if(newVersePages) {
+                        versePages = versePages.concat(newVersePages);
+                    }
                 }
             }
             this.verses = verses; // Update the verses
             // console.log('verses', verses);
             this.versePages = versePages; 
             console.log('versepages', versePages);
-            this.selectedVerse = versePages[0].key; // Update the selectedVerse
+            this.selectedVerse = 0; // Update the selectedVerse
             this.selectVerse(); // Call the selectVerse method which updates the view (if there is one)
             //transformed = transformed.replace(empty_verses_regexp,'');
             // return transformed;
         },
         transformVerse : function( index, verses ) { 
             
-            if (index.slice(-8) == '_region2') return {}; // We don't deal with region2 verses, as they'll be dealt with in the original verse
+            if (index.slice(-8) == '_region2') return; // We don't deal with region2 verses, as they'll be dealt with in the original verse
 
             var verse = verses[index];
-
-            // var item = document.createElement('richlistitem');
-            // item.setAttribute('orient','vertical');
-            
-            // Verse numbering handled in template
-            // var verse_num = document.createElement('description');
-            // verse_num.setAttribute('class','identifier');
-            
-            // if (parseInt(index) == index) { // This is a verse ?
-            //     var span = document.createElement('span');
-            //     span.setAttribute('class','underline');
-            //     span.appendChild( document.createTextNode(index) );
-            //     verse_num.appendChild( document.createTextNode('Verse ') );
-            //     verse_num.appendChild( span );
-            //     verse_num.appendChild( document.createTextNode(':') );
-            // } else {
-            //     verse_num.appendChild( document.createTextNode( index.charAt(0).toUpperCase() + index.slice(1) + ':')  );
-            // } 
-            // item.appendChild(verse_num);
 
             var versePages = [];
             var versePage = {
                 key: '',
                 lines: []
             }; // A page of a verse, there's a new page after an empty line.
-            var pageSuffix = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+            var pageCounter = 0;
+            var pageSuffix = 'abcdefghijklmnopqrstuvwxyz';
             
             if (!verses[index+'_region2']) { // There's no region 2 defined for the text
-                var pageCounter = 0;
                 for (var j = 0; j < verse.length; j++) {
                     var line = verse[j];
                     if (line != NEW_PAGE_INDICATOR) {
@@ -315,56 +377,42 @@ var controlApp = new Vue({
                     }
                 }
             } else {
-                
-                var region2_size;
-                try {
-                    region2_size = WorshipSlides.MainWindow.getIntPref('region2_size');
-                } catch (error) {}
-                if (!region2_size)
-                    region2_size = 100;
-                    
                 var region2 = verses[index+'_region2'];
                 var reg1_part = 0;
                 var reg2_part = 0;
                 var failsafe = 0;
-                while (reg1_part < verse.childNodes.length || reg2_part < region2.childNodes.length)
+                while (reg1_part < verse.length || reg2_part < region2.length)
                 {
                     if (failsafe++ > verse.childNodes + region2.childNodes)
                     break;
-                    if (verse.childNodes[reg1_part] && verse.childNodes[reg1_part].tagName != 'br' && verse.childNodes[reg1_part].tagName != 'hr') {
-                    desc.appendChild( verse.childNodes[reg1_part].cloneNode(true) );
-                    desc.appendChild( document.createElementNS('http://www.w3.org/1999/xhtml','br') );
-                    reg1_part++;
+                    if (verse[reg1_part] && verse[reg1_part] !== NEW_PAGE_INDICATOR) {
+                        versePage.lines.push( verse[reg1_part] );
+                        reg1_part++;
                     }
-                    if (region2.childNodes[reg2_part] && region2.childNodes[reg2_part].tagName != 'br' && region2.childNodes[reg2_part].tagName != 'hr') {
-                    var span = document.createElement('span');
-                    span.setAttribute('style','font-size: '+region2_size+'%;');
-                    span.appendChild( region2.childNodes[reg2_part].cloneNode(true) );
-                    desc.appendChild( span );
-                    desc.appendChild( document.createElementNS('http://www.w3.org/1999/xhtml','br') );
-                    reg2_part++;
+                    if (region2[reg2_part] && region2[reg2_part] !== NEW_PAGE_INDICATOR) {
+                        versePage.lines.push( REGION2_INDICATOR + region2[reg2_part] );
+                        reg2_part++;
                     }
-                    if (verse.childNodes[reg1_part] && verse.childNodes[reg1_part].tagName == 'br')
-                    reg1_part++;
-                    if (region2.childNodes[reg2_part] && region2.childNodes[reg2_part].tagName == 'br')
-                    reg2_part++;
-                    if ((!verse.childNodes[reg1_part] || verse.childNodes[reg1_part].tagName == 'hr') &&
-                    (!region2.childNodes[reg2_part] || region2.childNodes[reg2_part].tagName == 'hr')) {
-                    item.appendChild( desc );
-                    listbox.appendChild( item );
-                    item = document.createElement('richlistitem');
-                    desc = document.createElement('description');
-                    reg1_part++;
-                    reg2_part++;
+                    if ((!verse[reg1_part] || verse[reg1_part] === NEW_PAGE_INDICATOR) &&
+                    (!region2[reg2_part] || region2[reg2_part] === NEW_PAGE_INDICATOR)) {
+                        var key = index;
+                        if(pageCounter > 0) {
+                            key += pageSuffix[pageCounter]
+                        }
+                        versePage.key = key;
+                        versePages.push(versePage);
+                        pageCounter++;
+                        versePage = { key: '', lines: [] }; // Prepare for a new page
+                        reg1_part++;
+                        reg2_part++;
                     }
                 }
             }
             if (versePage.lines.length > 0) {
                 versePage.key = index;
                 versePages.push(versePage);
-                versePage = []; // This line does nothing?
             }
-            console.log(versePages);
+            console.log('Transform Verse:', versePages);
             return versePages;
         }
     },

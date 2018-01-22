@@ -63,12 +63,12 @@
         </button>
         <button accesskey="D"
                 tooltiptext="Edit item (Shortcut: d)"
-                oncommand="WorshipSlides.MainWindow.editItem(event);">
+                @click="openEditWindow">
                 Edit
         </button>
         <button accesskey="R"
                 tooltiptext="Remove item (Shortcut: r)"
-                oncommand="WorshipSlides.MainWindow.removeItem(event);">
+                @click="removeItem">
                 Remove
         </button>
       </div>
@@ -150,15 +150,12 @@
         </button>
       </div>
       <div class="verse_list">
-        <label v-for="page in versePages" class="verse_selector" @click="selectVerse" v-bind:class="{ active: page.key === selectedVerse }">
-          <input type="radio" v-bind:value="page.key" v-model="selectedVerse">
+        <label v-for="(page, index) in versePages" class="verse_selector" v-bind:class="{ active: index === selectedVerse }">
+          <input type="radio" v-bind:value="index" v-model="selectedVerse" @change="selectVerse">
           <h3>{{page.key}}:</h3>
-          <div v-for="line in page.lines" class="">{{line}}</div>
+          <div v-for="line in page.lines" v-bind:class="{ 'line--region2': line.slice(0,1) === REGION2_INDICATOR }">{{line}}</div>
         </label>
       </div>
-      <!-- <richlistbox flex="1" id="worship_lyrics"
-        onselect="WorshipSlides.MainWindow.selectVerse(event);">
-      </richlistbox> -->
     </div>
     
     <div class="column column--right" >

@@ -228,7 +228,7 @@ exports = module.exports = __webpack_require__(7)(undefined);
 
 
 // module
-exports.push([module.i, "html,\r\nbody {\r\n  width: 100%;\r\n  height: 100%;\r\n  margin: 0;\r\n  padding: 0;\r\n  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\r\n}\r\n\r\nbody {\r\n  display: flex;\r\n  justify-content: center;\r\n  align-items: center;\r\n  color: #525252;\r\n}\r\n\r\na {\r\n  text-decoration: none;\r\n  color: #cb3837;\r\n}\r\n\r\n.container {\r\n  text-align: center;\r\n}\r\n\r\n/* PRESENTATION */\r\n#presentation {\r\n  width: 100%;\r\n  height: 100%;\r\n  background-color: black;\r\n  color: white;\r\n}\r\n\r\n.blank-overlay {\r\n  position: absolute;\r\n  top: 0;\r\n  bottom: 0;\r\n  left: 0;\r\n  right: 0;\r\n  background-color: #000;\r\n  transition: opacity .25s;\r\n  border: 6px double #222;\r\n}\r\n\r\n.blank-overlay--hidden {\r\n  opacity: 0;\r\n}\r\n\r\n/* New stuff */\r\n\r\n.column {\r\n  padding: 1em;\r\n}\r\n.column--left, \r\n.column--right {\r\n  background-color: #eee;\r\n}\r\n\r\n.flex {\r\n  display: flex;\r\n}\r\n\r\n.flex--v {\r\n  display: flex;\r\n  flex-direction: column;\r\n}\r\n\r\n.flex__main {\r\n  flex: 1;\r\n}\r\n\r\n.shortcuts {\r\n  font-size: 75%;\r\n}\r\n\r\n.header {\r\n  margin: .5em 0 .5em;\r\n  display: block;\r\n  text-transform: uppercase;\r\n  font-size: 12px;\r\n  letter-spacing: .1em;\r\n  color: #888;\r\n}\r\n\r\n.verse_list {\r\n  overflow: scroll-y;\r\n}\r\n\r\n.verse_selector {\r\n  background-color: white;\r\n  border: 1px solid #ddd;\r\n  padding: 1em;\r\n  display: block;\r\n  cursor: pointer;\r\n  transition: all .2s;\r\n}\r\n.verse_selector.active {\r\n  background-color: #ade;\r\n  box-shadow: inset 0 0 0 2px #39e;\r\n  \r\n}\r\n.verse_selector:hover {\r\n  background-color: #eff;\r\n}\r\n.verse_selector>input {\r\n  display: none;\r\n}\r\n.verse_selector>h3 {\r\n  margin: 0;\r\n  font-size: 1em;\r\n  font-weight: normal;\r\n  text-transform: uppercase;\r\n  font-size: 12px;\r\n  letter-spacing: .1em;\r\n  color: #888;\r\n}\r\n.verse_selector--p {\r\n  margin: 0;\r\n}\r\n\r\n/* worship.css */\r\n\r\n\r\nbutton {\r\n  min-width: 10px;\r\n  border: 1px solid #777;\r\n  background-color: #eee;\r\n  font-family: inherit;\r\n  padding: .3em .8em;\r\n  border-radius: .2em;\r\n  margin-bottom: .3em;\r\n  cursor: pointer;\r\n  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.3);\r\n}\r\nbutton:active {\r\n  box-shadow: none;\r\n  background-color: #aaa;\r\n}\r\nbutton:focus {\r\n  outline: none;\r\n  border-color: #39e;\r\n}\r\n\r\n.btn--main {\r\n  padding: 1em;\r\n  font-size: 1.2em;\r\n}\r\n\r\n#worship_preview_box {\r\n  width: 250px;\r\n  height: 200px;\r\n  background: black;\r\n  color: white;\r\n}\r\n#worship_preview {\r\n  text-align: center;\r\n}\r\n#worship_preview_box description{\r\n  word-wrap: break-word;\r\n  width: 250px;\r\n}\r\n\r\n#worship_presentation_box {\r\n  background: black;\r\n  color: white;\r\n}\r\n#worship_presentation_box  description {\r\n  word-wrap: break-word;\r\n}\r\n#worship_preview_box description span, #worship_presentation_box  description span {\r\n  display: inline-block;\r\n}\r\n#worship_presentation {\r\n  text-align: center;\r\n}\r\n.identifier {\r\n  font-style: italic;\r\n  margin-bottom: 0;\r\n  padding-bottom: 0;\r\n}\r\n\r\n#worship_preview_title {\r\n  font-size: 60%;\r\n  /*color: #ccc;*/\r\n  opacity: 0.6;\r\n}\r\n#worship_preview_author, #worship_preview_copyright, #worship_preview_ccli {\r\n  font-size: 40%;\r\n  /*color: #aaa;*/\r\n  opacity: 0.4;\r\n}\r\n\r\n.underline {\r\n  text-decoration: underline;\r\n}\r\n.region2 {\r\n  font-size: 100%;\r\n}\r\n\r\n\r\n\r\n/* worshipSlidesUI.css */\r\n\r\n/* #worshipslides-start-button {\r\n  list-style-image: url(\"chrome://worshipslides/skin/music_folder.png\");\r\n}\r\n\r\ntoolbarbutton.worshipslides-toolbarbutton {\r\n  list-style-image: url(\"chrome://worshipslides/skin/music_folder.png\");\r\n} */", ""]);
+exports.push([module.i, "html,\r\nbody {\r\n  width: 100%;\r\n  height: 100%;\r\n  margin: 0;\r\n  padding: 0;\r\n  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\r\n}\r\n\r\nbody {\r\n  display: flex;\r\n  justify-content: center;\r\n  align-items: center;\r\n  color: #525252;\r\n}\r\n\r\na {\r\n  text-decoration: none;\r\n  color: #cb3837;\r\n}\r\n\r\n.container {\r\n  text-align: center;\r\n}\r\n\r\n/* PRESENTATION */\r\n#presentation {\r\n  --background: #333;\r\n  --text-color: white;\r\n  --font-size: 72px;\r\n  --region2-size: 1.5em;\r\n  position: absolute;\r\n  top: 0;\r\n  bottom: 0;\r\n  left: 0;\r\n  right: 0;\r\n  background: var(--background);\r\n  color: var(--text-color);\r\n}\r\n\r\n#presentation .line--region2 {\r\n  font-size: var(--region2-size);\r\n  color: yellow;\r\n  font-family: Tahoma, Arial, Helvetica, \"Microsoft YaHei New\", \"Microsoft Yahei\", \"\\5FAE\\8F6F\\96C5\\9ED1\", 宋体, SimSun, STXihei, \"\\534E\\6587\\7EC6\\9ED1\", sans-serif;\r\n  letter-spacing: .2em;\r\n}\r\n\r\n#content {\r\n  font-size: var(--font-size);\r\n  overflow-y: auto;\r\n  text-align: center;\r\n  text-shadow: 0 .1em .1em rgba(0,0,0,0.3);\r\n  padding: .5em;\r\n}\r\n\r\n.presentation__info {\r\n  padding: .8em;\r\n  opacity: .75;\r\n}\r\n\r\n.blank-overlay {\r\n  position: absolute;\r\n  top: 0;\r\n  bottom: 0;\r\n  left: 0;\r\n  right: 0;\r\n  background-color: #000;\r\n  transition: opacity .25s;\r\n  border: 6px double #222;\r\n}\r\n\r\n.blank-overlay--hidden {\r\n  opacity: 0;\r\n}\r\n\r\n/* New stuff */\r\n\r\n.column {\r\n  padding: 1em;\r\n}\r\n.column--left, \r\n.column--right {\r\n  background-color: #eee;\r\n}\r\n\r\n.flex {\r\n  display: flex;\r\n}\r\n\r\n.flex--v {\r\n  display: flex;\r\n  flex-direction: column;\r\n}\r\n\r\n.flex__main {\r\n  flex: 1;\r\n}\r\n\r\n.shortcuts {\r\n  font-size: 75%;\r\n}\r\n\r\n.header {\r\n  margin: .5em 0 .5em;\r\n  display: block;\r\n  text-transform: uppercase;\r\n  font-size: 12px;\r\n  letter-spacing: .1em;\r\n  color: #888;\r\n}\r\n\r\n.verse_list {\r\n  overflow: scroll-y;\r\n}\r\n\r\n.verse_selector {\r\n  background-color: white;\r\n  border: 1px solid #ddd;\r\n  padding: 1em;\r\n  display: block;\r\n  cursor: pointer;\r\n  transition: all .2s;\r\n}\r\n.verse_selector.active {\r\n  background-color: #ade;\r\n  box-shadow: inset 0 0 0 2px #39e;\r\n  \r\n}\r\n.verse_selector:hover {\r\n  background-color: #eff;\r\n}\r\n.verse_selector>input {\r\n  display: none;\r\n}\r\n.verse_selector>h3 {\r\n  margin: 0;\r\n  font-size: 1em;\r\n  font-weight: normal;\r\n  text-transform: uppercase;\r\n  font-size: 12px;\r\n  letter-spacing: .1em;\r\n  color: #888;\r\n}\r\n.verse_selector--p {\r\n  margin: 0;\r\n}\r\n.line--region2 {\r\n  font-size: 1.1em;\r\n  color: #279;\r\n}\r\n\r\n/* worship.css */\r\n\r\n\r\nbutton {\r\n  min-width: 10px;\r\n  border: 1px solid #777;\r\n  background-color: #eee;\r\n  font-family: inherit;\r\n  padding: .3em .8em;\r\n  border-radius: .2em;\r\n  margin-bottom: .3em;\r\n  cursor: pointer;\r\n  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.3);\r\n}\r\nbutton:active {\r\n  box-shadow: none;\r\n  background-color: #aaa;\r\n}\r\nbutton:focus {\r\n  outline: none;\r\n  border-color: #39e;\r\n}\r\n\r\n.btn--main {\r\n  padding: 1em;\r\n  font-size: 1.2em;\r\n}\r\n\r\n#worship_preview_box {\r\n  width: 250px;\r\n  height: 200px;\r\n  background: black;\r\n  color: white;\r\n}\r\n#worship_preview {\r\n  text-align: center;\r\n}\r\n#worship_preview_box description{\r\n  word-wrap: break-word;\r\n  width: 250px;\r\n}\r\n\r\n#worship_presentation_box {\r\n  background: black;\r\n  color: white;\r\n}\r\n#worship_presentation_box  description {\r\n  word-wrap: break-word;\r\n}\r\n#worship_preview_box description span, #worship_presentation_box  description span {\r\n  display: inline-block;\r\n}\r\n#worship_presentation {\r\n  text-align: center;\r\n}\r\n.identifier {\r\n  font-style: italic;\r\n  margin-bottom: 0;\r\n  padding-bottom: 0;\r\n}\r\n\r\n#worship_preview_title {\r\n  font-size: 60%;\r\n  /*color: #ccc;*/\r\n  opacity: 0.6;\r\n}\r\n#worship_preview_author, #worship_preview_copyright, #worship_preview_ccli {\r\n  font-size: 40%;\r\n  /*color: #aaa;*/\r\n  opacity: 0.4;\r\n}\r\n\r\n.underline {\r\n  text-decoration: underline;\r\n}\r\n.region2 {\r\n  font-size: 100%;\r\n}\r\n\r\n\r\n\r\n/* worshipSlidesUI.css */\r\n\r\n/* #worshipslides-start-button {\r\n  list-style-image: url(\"chrome://worshipslides/skin/music_folder.png\");\r\n}\r\n\r\ntoolbarbutton.worshipslides-toolbarbutton {\r\n  list-style-image: url(\"chrome://worshipslides/skin/music_folder.png\");\r\n} */", ""]);
 
 // exports
 
@@ -11528,13 +11528,39 @@ const app = electron.remote.app;
 const appDir = _fsJetpack.default.cwd(app.getAppPath());
 
 const ipcRenderer = electron.ipcRenderer;
+const minFontSize = 12;
 var presentationApp = new _vueAlias.default({
   el: '#presentation',
   data: {
     content: ['content-placeholder'],
     title: 'title-placeholder',
     author: 'author-placeholder',
-    isBlank: false
+    isBlank: false,
+    REGION2_INDICATOR: '+'
+  },
+  updated: function () {
+    // After a data change causes DOM to update, fit the text to the container
+    this.fitText();
+  },
+  methods: {
+    fitText: function () {
+      // this.el.style.setPropterty
+      const content = this.$el.childNodes[0];
+
+      function resizeText() {
+        content.style.setProperty('--font-size', `${fontSize--}px`);
+      }
+
+      let fontSize = 72; //parseInt( getComputedStyle(content).getPropertyValue('--font-size').slice(0, -2) );
+
+      resizeText();
+      console.log('Font Size started at: ', fontSize, content.scrollHeight, content.offsetHeight);
+
+      while (content.scrollHeight > content.offsetHeight && fontSize > minFontSize && fontSize < 200) {
+        console.log(content.scrollHeight, content.offsetHeight);
+        resizeText();
+      }
+    }
   }
 });
 ipcRenderer.on('update-presentation', function (event, data) {
